@@ -2,6 +2,7 @@ from .Point import *
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class DescendantGradient(object):
 
     # Returns te global minimum of the function
@@ -29,11 +30,15 @@ class DescendantGradient(object):
 
             iteration += 1
 
+        # Appends Resultf
+        result = Point(x=value, y=func.f(value).y)
+        values_visited.append(result)
+
         # return visited values and minimum x value
-        return values_visited, Point(x=value, y=func.f(value).y), iteration
+        return values_visited, result, iteration
 
     @staticmethod
-    def plot_analysis(title, func, visited_values, result, iterations, precision):
+    def plot_analysis(title, func, visited_values, result, iterations, precision, offset_left=1.0, offset_right=1.0):
         title += ' - ' + str(iterations) + ' interations for ' + str(precision) + ' decimal points precision'
 
         # Configures ploting style and layout
@@ -47,7 +52,7 @@ class DescendantGradient(object):
         max_x = max([value.x for value in visited_values])
 
         # Gets points to plot curve
-        points = [func.f(i) for i in np.arange(min_x, max_x, 0.001)]
+        points = [func.f(i) for i in np.arange(float(min_x - offset_left), float(max_x + offset_right), 0.1)]
 
         # Plots curve in boundaries
         plt.plot([p.x for p in points], [p.y for p in points], color='#395C6B')

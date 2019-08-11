@@ -12,6 +12,6 @@ class Function(object):
     def f(self, x):
         return Point(x=x, y=self.function(x))
 
-    # Returns Derivative value
+    # Returns Derivative valueO
     def derive(self, x):
         return Point(x=x, y=self.derivative(x))
