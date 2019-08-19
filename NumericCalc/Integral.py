@@ -14,48 +14,65 @@ class Integral(object):
     # Mean Point Formula
     @staticmethod
     def mean_point(func, a, b):
-        return (b - a) * func((a + b)/2.0)
+        _, fx = func.f((a + b)/2.0)
+        return (b - a) * fx
 
     # Trapezoid formula
     @staticmethod
     def trapezoid(func, a, b):
-        return (b - a) * ((func(a) + func(b))/2.0)
+        _, fx_a = func.f(a)
+        _, fx_b = func.f(b)
+        return (b - a) * (fx_a + fx_b)/2.0
 
     # Simpson formula
     @staticmethod
     def simpson(func, a, b):
-        return (b - a) * ((func(a) + 4 * func((a + b)/2.0) + func(b))/6.0)
+        _, fx_a = func.f(a)
+        _, fx_b = func.f(b)
+        _, fx_ab = func.f((a + b)/2.0)
+
+        return (b - a) * (fx_a + 4 * fx_ab + fx_b)/6.0
+
+    # returns the maximum derivative for a given function and an interval
+    @staticmethod
+    def get_max_derivative(deriv, a, b, step):
+        values = []
+
+        # Appends all the derivative values given a step
+        x = a
+        while x <= b:
+            _, dx = deriv(x)
+            values.append(dx)
+            x += step
+
+        # Gets and returns the maximum derivative value
+        maximum = max(values)
+        return maximum
 
     # Mean point error
     @staticmethod
-    def mean_point_error(func, step):
-        derivative = Integral.derivative(func, step, 2)
+    def mean_point_error(func, a, b, n):
+        # Get maximum second derivative
+        derivative = Integral.get_max_derivative(func.derive2, a, b, 0.0001)
 
-        return (np.power(step, 3) / 24) * derivative
+        return np.abs((np.power(b - a, 3) / (24 * n**2)) * derivative)
 
     # Trapezoid error
     @staticmethod
-    def trapezoid_error(func, step):
-        derivative = Integral.derivative(func, step, 2)
+    def trapezoid_error(func, a, b, n):
+        # Get maximum second derivative
+        derivative = Integral.get_max_derivative(func.derive2, a, b, 0.0001)
 
-        return (-1) * (np.power(step, 3) / 12) * derivative
+        return np.abs((-1) * (np.power(b - a, 3) / (12 * n**2)) * derivative)
 
     # Simpson error
     @staticmethod
-    def simpson_error(func, step):
-        derivative = Integral.derivative(func, step, 4)
+    def simpson_error(func, a, b, n):
+        # Get maximum fourth derivative
+        derivative = Integral.get_max_derivative(func.derive4, a, b, 0.0001)
 
-        return (-1) * (np.power(step, 5)/2880) * derivative
+        return np.abs((-1) * (np.power(b - a, 5)/(2880 * n**4)) * derivative)
 
-    # Returns the derivative of a function with a given order
-    @staticmethod
-    def derivative(func, x, order):
-        delta_x = 0.00001
-
-        if order == 1:
-            return (func(x + delta_x) - func(x)) / delta_x
-        else:
-            return (Integral.derivative(func, x + delta_x, order - 1) - Integral.derivative(func, x, order - 1)) / delta_x
 
     # Return intervals to calculations
     @staticmethod
@@ -69,41 +86,45 @@ class Integral(object):
         for i in range(n_intervals + 1):
             intervals.append(init + i * step)
 
-        # returns measuring intervals and step
+        # Returns measuring intervals and step
         return intervals, step
 
     @staticmethod
-    def integrate(func, a, b, type, err, inte):
+    def integrate(func, a, b, type, err):
 
         # Defines what method will be used
         # For Mean Point
         if type == IntegralType.MEANPOINT:
             formula = Integral.mean_point
             error = Integral.mean_point_error
+            name = "Mean Point"
 
         # For Trapezoid
         elif type == IntegralType.TRAPEZOID:
             formula = Integral.trapezoid
             error = Integral.trapezoid_error
+            name = "Trapezoid"
 
         # For Simpson
         else:
             formula = Integral.simpson
             error = Integral.simpson_error
+            name = "Simpson"
 
         # Increases measuring points to reduce error until the desired value is reached
         sections = 1
         intervals, step = Integral.get_intervals(a, b, sections)
 
-        while error(func, step) > err:
+        while error(func, a, b, len(intervals) - 1) > err:
             sections = sections * 2
             intervals, step = Integral.get_intervals(a, b, sections)
-
-        intervals, step = Integral.get_intervals(a, b, inte)
 
         # Sums formula result for each interval and returns it as the integral value
         sum = 0
         for i in range(0, len(intervals) - 1):
             sum += formula(func, intervals[i], intervals[i+1])
+
+        # Prints result
+        print(name + " ===> " + "result: " + str(sum) + "| subdivisions: " + str(sections) + "| error: " + str(error(func, a, b, len(intervals) - 1)))
 
         return sum
