@@ -125,6 +125,6 @@ class Integral(object):
             sum += formula(func, intervals[i], intervals[i+1])
 
         # Prints result
-        print(name + " ===> " + "result: " + str(sum) + "| subdivisions: " + str(sections) + "| error: " + str(error(func, a, b, len(intervals) - 1)))
+        print(name + " ===> " + "result: " + "%.10f" % sum + " | subdivisions: " + str(sections) + " | error: " + "%.10f" % error(func, a, b, len(intervals) - 1))
 
         return sum
