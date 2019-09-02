@@ -22,4 +22,5 @@ I hope you enjoy and learn with the beauty of Machine Learning as much as I did 
 The algorithms contained in this project are:
 - [x] Newton-Raphson
 - [x] Numeric Integral
-- [x] Montecarlo
+- [x] Monte Carlo
+- [x] Parallel Monte Carlo using MPI

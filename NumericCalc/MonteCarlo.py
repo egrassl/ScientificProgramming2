@@ -1,4 +1,6 @@
 import numpy as np
+from mpi4py import MPI
+
 
 class MonteCarlo(object):
 
@@ -33,4 +35,3 @@ class MonteCarlo(object):
         result = volume * sum / n
 
         return result
-
